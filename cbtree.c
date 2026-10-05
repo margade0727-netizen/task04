@@ -5,7 +5,8 @@
 */
 void cb_push(CBTree *p, int x)
 {
-        /* Энд оруулах үйлдлийг хийнэ үү */
+    p->cb_arr[p->cb_len] = x;
+    p->cb_len++;
 }
 
 /*
@@ -14,7 +15,17 @@ void cb_push(CBTree *p, int x)
 */
 int cb_left(const CBTree *p, int idx)
 {
-        /* Энд зүүн хүүхдийн индексийг буцаах үйлдлийг хийнэ үү */
+    if (idx < 0 || idx >= p->cb_len) {
+        return -1;
+    }
+
+    int left = 2 * idx + 1;
+
+    if (left >= p->cb_len) {
+        return -1;
+    }
+
+    return left;
 }
 
 /*
@@ -23,7 +34,17 @@ int cb_left(const CBTree *p, int idx)
 */
 int cb_right(const CBTree *p, int idx)
 {
-        /* Энд баруун хүүхдийн индексийг буцаах үйлдлийг хийнэ үү */
+    if (idx < 0 || idx >= p->cb_len) {
+        return -1;
+    }
+
+    int right = 2 * idx + 2;
+
+    if (right >= p->cb_len) {
+        return -1;
+    }
+
+    return right;
 }
 
 /*
@@ -33,9 +54,14 @@ int cb_right(const CBTree *p, int idx)
 */
 int cb_search(const CBTree *p, int x)
 {
-        /* Энд хайх үйлдлийг хийнэ */	
-}
+    for (int i = 0; i < p->cb_len; i++) {
+        if (p->cb_arr[i] == x) {
+            return i;
+        }
+    }
 
+    return -1;
+}
 /*
   p-ийн зааж буй CBTree-д idx индекстэй зангилаанаас дээшхи бүх өвөг эцэгийг олох үйлдлийг хийнэ.
   Тухайн орой өөрөө өвөг эцэгт орохгүй.
@@ -43,7 +69,16 @@ int cb_search(const CBTree *p, int x)
 */
 void cb_ancestors(const CBTree *p, int idx)
 {
-        /* Энд өвөг эцгийг олох үйлдлийг хийнэ үү */
+    if (idx <= 0 || idx >= p->cb_len) {
+        return;
+    }
+
+    int i = idx;
+
+    while (i != 0) {
+        i = (i - 1) / 2;
+        printf("%d\n", p->cb_arr[i]);
+    }
 }
 
 /*
@@ -51,7 +86,19 @@ void cb_ancestors(const CBTree *p, int idx)
 */
 int cb_height(const CBTree *p)
 {
-        /* Энд өндрийг олох үйлдлийг хийнэ */
+    if (p->cb_len == 0) {
+        return 0;
+    }
+
+    int i = p->cb_len - 1;
+    int height = 1;
+
+    while (i != 0) {
+        i = (i - 1) / 2;
+        height++;
+    }
+
+    return height;
 }
 
 /*
@@ -61,16 +108,61 @@ int cb_height(const CBTree *p)
 */
 int cb_sibling(const CBTree *p, int idx)
 {
-        /* Энд ах, дүүг олох үйлдлийг хийнэ үү */
-}
+    if (idx < 1 || idx >= p->cb_len) {
+        return -1;
+    }
 
+    int parent = (idx - 1) / 2;
+    int left = 2 * parent + 1;
+    int right = 2 * parent + 2;
+
+    if (left >= p->cb_len || right >= p->cb_len) {
+        return -1;
+    }
+
+    if (idx == left) {
+        return right;
+    }
+
+    return left;
+}
 /*
   p-ийн зааж буй CBTree-г idx дугаартай зангилаанаас эхлэн preorder-оор хэвлэ.
   Орой бүрийг нэг шинэ мөрөнд хэвлэнэ.
 */
 void cb_preorder(const CBTree *p, int idx)
 {
-        /* Энд pre-order-оор хэвлэх үйлдлийг хийнэ үү */
+    if (idx < 0 || idx >= p->cb_len) {
+        return;
+    }
+
+    int j = idx;
+
+    printf("%d\n", p->cb_arr[j]);
+
+    while (j * 2 + 1 < p->cb_len) {
+        j = j * 2 + 1;
+        printf("%d\n", p->cb_arr[j]);
+    }
+
+    while (j != idx) {
+        int parent = (j - 1) / 2;
+
+        if (j == parent * 2 + 1 &&
+            parent * 2 + 2 < p->cb_len) {
+
+            j = parent * 2 + 2;
+            printf("%d\n", p->cb_arr[j]);
+
+            while (j * 2 + 1 < p->cb_len) {
+                j = j * 2 + 1;
+                printf("%d\n", p->cb_arr[j]);
+            }
+        }
+        else {
+            j = parent;
+        }
+    }
 }
 
 /*
@@ -79,16 +171,29 @@ void cb_preorder(const CBTree *p, int idx)
 */
 void cb_inorder(const CBTree *p, int idx)
 {
-        /* Энд in-order-оор хэвлэх үйлдлийг хийнэ үү */
+    if (idx < 0 || idx >= p->cb_len) {
+        return;
+    }
+
+    cb_inorder(p, idx * 2 + 1);
+    printf("%d\n", p->cb_arr[idx]);
+    cb_inorder(p, idx * 2 + 2);
 }
+
 
 /*
   p-ийн зааж буй CBTree-г idx дугаартай зангилаанаас эхлэн post-order-оор хэвлэ.
   Орой бүрийг нэг шинэ мөрөнд хэвлэнэ.
- */
+*/
 void cb_postorder(const CBTree *p, int idx)
 {
-        /* Энд post-order-оор хэвлэх үйлдлийг хийнэ үү */
+    if (idx < 0 || idx >= p->cb_len) {
+        return;
+    }
+
+    cb_postorder(p, idx * 2 + 1);
+    cb_postorder(p, idx * 2 + 2);
+    printf("%d\n", p->cb_arr[idx]);
 }
 
 /*
@@ -98,7 +203,19 @@ void cb_postorder(const CBTree *p, int idx)
 */
 void cb_leaves(const CBTree *p, int idx)
 {
-        /* Энд навчуудыг үйлдлийг хийнэ үү */
+    if (idx < 0 || idx >= p->cb_len) {
+        return;
+    }
+
+    int left = idx * 2 + 1;
+
+    if (left >= p->cb_len) {
+        printf("%d\n", p->cb_arr[idx]);
+        return;
+    }
+
+    cb_leaves(p, left);
+    cb_leaves(p, idx * 2 + 2);
 }
 
 /*
@@ -108,9 +225,23 @@ void cb_leaves(const CBTree *p, int idx)
 */
 void cb_descendants(const CBTree *p, int idx)
 {
-        /* Энд үр садыг олох үйлдлийг хийнэ үү */
-}
+    if (idx < 0 || idx >= p->cb_len) {
+        return;
+    }
 
+    int left = idx * 2 + 1;
+    int right = idx * 2 + 2;
+
+    if (left < p->cb_len) {
+        printf("%d\n", p->cb_arr[left]);
+        cb_descendants(p, left);
+    }
+
+    if (right < p->cb_len) {
+        printf("%d\n", p->cb_arr[right]);
+        cb_descendants(p, right);
+    }
+}
 
 /*
   p-ийн зааж буй Tree-д хэдэн элемент байгааг буцаана.
@@ -118,9 +249,8 @@ void cb_descendants(const CBTree *p, int idx)
 */
 int cb_size(const CBTree *p)
 {
-        /* Энд хэмжээг олох үйлдлийг хийнэ үү */	
+    return p->cb_len;
 }
-
 
 /*
   p-ийн зааж буй CBTree-д x утгаас үндэс хүртэлх оройнуудын тоог буцаана.
@@ -128,6 +258,18 @@ int cb_size(const CBTree *p)
 */
 int cb_level(const CBTree *p, int x)
 {
-        /* Энд түвшинг олох үйлдлийг хийнэ үү */
-}
+    int idx = cb_search(p, x);
 
+    if (idx == -1) {
+        return -1;
+    }
+
+    int level = 0;
+
+    while (idx != 0) {
+        idx = (idx - 1) / 2;
+        level++;
+    }
+
+    return level;
+}
